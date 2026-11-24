@@ -107,14 +107,17 @@ def _remote_modules(k, pid: int) -> dict[str, tuple[int, str]]:
 def _export_rva(dll: Path, export: str) -> int:
     import pefile
     pe = pefile.PE(str(dll), fast_load=True)
-    pe.parse_data_directories(directories=[pefile.DIRECTORY_ENTRY["IMAGE_DIRECTORY_ENTRY_EXPORT"]])
-    for symbol in getattr(getattr(pe, "DIRECTORY_ENTRY_EXPORT", None), "symbols", []):
-        if symbol.name == export.encode("ascii"):
-            # Native plugins may not forward V3NL_PluginInit to a different DLL.
-            if symbol.forwarder:
-                raise RemoteInjectionError(f"Forwarded entry export is not supported: {dll}")
-            return int(symbol.address)
-    raise RemoteInjectionError(f"Entry export {export} not found in {dll}")
+    try:
+        pe.parse_data_directories(directories=[pefile.DIRECTORY_ENTRY["IMAGE_DIRECTORY_ENTRY_EXPORT"]])
+        for symbol in getattr(getattr(pe, "DIRECTORY_ENTRY_EXPORT", None), "symbols", []):
+            if symbol.name == export.encode("ascii"):
+                # Native plugins may not forward V3NL_PluginInit to a different DLL.
+                if symbol.forwarder:
+                    raise RemoteInjectionError(f"Forwarded entry export is not supported: {dll}")
+                return int(symbol.address)
+        raise RemoteInjectionError(f"Entry export {export} not found in {dll}")
+    finally:
+        pe.close()
 
 
 def _remote_loadlibrary(k, pid: int, handle: int) -> int:

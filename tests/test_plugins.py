@@ -56,3 +56,25 @@ class PluginTests(unittest.TestCase):
         self.assertEqual([p.id for p in plugins],["example"])
         self.assertEqual(warnings,[])
         self.assertFalse((self.root/"example"/"test.dll").exists())
+
+    def test_native_dll_validator_releases_windows_file_handle(self):
+        from types import SimpleNamespace
+        plugin = self.write_plugin()
+        with patch("pefile.PE") as ctor:
+            pe = ctor.return_value
+            pe.FILE_HEADER.Machine = 0x8664
+            pe.FILE_HEADER.Characteristics = 0x2000
+            pe.DIRECTORY_ENTRY_EXPORT.symbols = [
+                SimpleNamespace(name=b"V3NL_PluginInit")
+            ]
+            plugin._validate_pe()
+            pe.close.assert_called_once()
+
+    def test_native_dll_validator_releases_handle_on_error(self):
+        plugin = self.write_plugin()
+        with patch("pefile.PE") as ctor:
+            pe = ctor.return_value
+            pe.FILE_HEADER.Machine = 0x14c  # 32-bit DLL
+            with self.assertRaisesRegex(ValueError, "must be x64"):
+                plugin._validate_pe()
+            pe.close.assert_called_once()

@@ -37,8 +37,11 @@ def safe_game_executable(path: Path) -> None:
         raise PermissionError(f"Cannot read game executable: {path}")
     import pefile
     pe = pefile.PE(str(path), fast_load=True)
-    if pe.FILE_HEADER.Machine != 0x8664:
-        raise ValueError("Expected 64-bit Victoria 3 executable.")
+    try:
+        if pe.FILE_HEADER.Machine != 0x8664:
+            raise ValueError("Expected 64-bit Victoria 3 executable.")
+    finally:
+        pe.close()
 
 
 def running_game_pids() -> list[int]:

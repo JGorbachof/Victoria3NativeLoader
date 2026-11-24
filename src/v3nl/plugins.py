@@ -61,16 +61,20 @@ class NativePlugin:
     def _validate_pe(self) -> None:
         import pefile
         pe = pefile.PE(str(self.dll), fast_load=True)
-        if pe.FILE_HEADER.Machine != 0x8664:
-            raise ValueError(f"{self.id}: plugin DLL must be x64.")
-        if not (pe.FILE_HEADER.Characteristics & 0x2000):
-            raise ValueError(f"{self.id}: file is not a DLL.")
-        pe.parse_data_directories(directories=[pefile.DIRECTORY_ENTRY["IMAGE_DIRECTORY_ENTRY_EXPORT"]])
-        if not hasattr(pe, "DIRECTORY_ENTRY_EXPORT"):
-            raise ValueError(f"{self.id}: DLL has no exports.")
-        if not any(s.name == self.init_export.encode("ascii")
-                   for s in pe.DIRECTORY_ENTRY_EXPORT.symbols):
-            raise ValueError(f"{self.id}: required export {self.init_export} is missing.")
+        try:
+            if pe.FILE_HEADER.Machine != 0x8664:
+                raise ValueError(f"{self.id}: plugin DLL must be x64.")
+            if not (pe.FILE_HEADER.Characteristics & 0x2000):
+                raise ValueError(f"{self.id}: file is not a DLL.")
+            pe.parse_data_directories(directories=[pefile.DIRECTORY_ENTRY["IMAGE_DIRECTORY_ENTRY_EXPORT"]])
+            if not hasattr(pe, "DIRECTORY_ENTRY_EXPORT"):
+                raise ValueError(f"{self.id}: DLL has no exports.")
+            if not any(s.name == self.init_export.encode("ascii")
+                       for s in pe.DIRECTORY_ENTRY_EXPORT.symbols):
+                raise ValueError(f"{self.id}: required export {self.init_export} is missing.")
+        finally:
+            # Windows refuses to rename a staged DLL while pefile holds its mmap.
+            pe.close()
 
 
 def parse_plugin(path: Path) -> NativePlugin:

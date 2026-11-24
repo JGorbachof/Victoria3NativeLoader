@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "id": "tu_scheduler_probe",
+  "game_exe": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Victoria 3\\binaries\\victoria3.exe",
+  "base_userdir": "C:\\Users\\YOUR_USER\\Documents\\Paradox Interactive\\Victoria 3",
+  "mods": [
+    "C:\\Users\\YOUR_USER\\Documents\\Paradox Interactive\\Victoria 3\\mod\\terra_universalis_alpha"
+  ],
+  "candidate_plugin_id": "performance-scheduler-probe",
+  "game_arguments": [
+    "-handsoff",
+    "-automated_test",
+    "-scripted_tests",
+    "-no_notifications",
+    "-run_until=1337.05.01"
+  ],
+  "repetitions": 2,
+  "timeout_seconds": 900,
+  "min_complete_days": 25,
+  "build": {
+    "command": [
+      "cmd",
+      "/c",
+      "C:\\path\\to\\your\\performance_plugin\\build.cmd"
+    ],
+    "cwd": "C:\\path\\to\\your\\performance_plugin",
+    "dll": "C:\\path\\to\\your\\performance_plugin\\build\\performance_probe.dll",
+    "manifest": "C:\\path\\to\\your\\performance_plugin\\plugin.template.json",
+    "timeout_seconds": 300
+  }
+}

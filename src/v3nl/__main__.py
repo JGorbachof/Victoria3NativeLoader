@@ -14,8 +14,24 @@ def main() -> int:
     p.add_argument("--dry-run", action="store_true", help="Validate current selection; never launch game")
     p.add_argument("--list-playsets", action="store_true", help="Read the Paradox launcher database")
     p.add_argument("--playset-id", help="Dry-run a specific Paradox launcher playset")
+    p.add_argument("--native-experiment", help="Native performance experiment JSON manifest")
+    p.add_argument("--execute", action="store_true", help="Explicitly run --native-experiment (launches game)")
     args = p.parse_args()
     try:
+        if args.execute and not args.native_experiment:
+            raise ValueError("--execute requires --native-experiment.")
+        if args.native_experiment:
+            if args.playset_id or args.list_playsets:
+                raise ValueError("Experiment execution cannot be combined with playset commands.")
+            from pathlib import Path
+            from .experiments import load_spec, preview_trial, execute_trial
+            spec = load_spec(Path(args.native_experiment))
+            if args.execute and not args.dry_run:
+                result = execute_trial(spec)
+                print(json.dumps(result, indent=2))
+            else:
+                print(json.dumps(preview_trial(spec), indent=2))
+            return 0
         cfg = LauncherConfig.load()
         if args.list_playsets:
             print(json.dumps([x.__dict__ for x in playsets(__import__("pathlib").Path(cfg.base_userdir))],

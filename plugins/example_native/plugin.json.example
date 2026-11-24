@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "abi_version": 1,
+  "id": "example-native",
+  "name": "Example native plugin (no game modifications)",
+  "version": "0.1.0",
+  "dll": "example_native.dll",
+  "dll_sha256": "REPLACE_WITH_REAL_DLL_SHA256",
+  "supported_game_sha256": [
+    "57c4950e9f1046d61729e8faeedbbdbb7aa30ff2a45788217285eb735491ad36"
+  ],
+  "dependencies": [],
+  "init_export": "V3NL_PluginInit"
+}

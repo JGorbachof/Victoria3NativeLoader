@@ -1,8 +1,18 @@
 # Victoria 3 Native Loader (V3NL)
 
-A modular, local Windows launcher for **Victoria 3** that imports Paradox launcher
-playsets, preserves their mod load order, launches the game normally, and can
-optionally load independently developed **native x64 DLL plugins**.
+**A native DLL plugin loader for Victoria 3 on Windows.**
+
+The standard Paradox launcher handles scripted and asset mods, but does not
+provide a convenient, integrated way to inject native DLL plugins into the
+game. V3NL is designed to fill that gap: it lets developers and players install,
+select and load independently developed native x64 plugins alongside their
+existing Victoria 3 mod playsets.
+
+The purpose is to enable native engine extensions, such as performance
+optimizations and other functionality that ordinary game scripting cannot
+provide. Playset import, mod ordering and launch profiles are supporting
+features that keep native plugins convenient to use with existing mods,
+not an attempt to replace the Paradox launcher for ordinary modding.
 
 **Status: 0.1.0 developer preview.** No game optimization plugin is bundled
 or enabled. Native plugin integration is experimental and must be validated
@@ -10,6 +20,12 @@ against each supported game build before regular use.
 
 ## Features
 
+- Native DLL plugins in independently installable folders under
+  `%LOCALAPPDATA%\Victoria3NativeLoader\plugins\<plugin-id>`.
+- Explicit opt-in for native injection, per-plugin enable/disable and
+  dependency ordering.
+- Plugin SHA-256 checks, exact-game-executable hash allowlists, x64 PE
+  validation, and a stable `V3NL_PluginInit` export.
 - Read installed mods and playsets from the actual Paradox
   `launcher-v2.sqlite` database **read-only**.
 - Import a selected playset; add local mods; remove and reorder mods.
@@ -19,12 +35,6 @@ against each supported game build before regular use.
   `%LOCALAPPDATA%\Victoria3NativeLoader\profiles\<name>`.
 - Optional links to the existing **shader cache** (helps avoid unnecessary
   shader recompilation) and **save games**, without copying or deleting them.
-- Native DLL plugins in independently installable folders under
-  `%LOCALAPPDATA%\Victoria3NativeLoader\plugins\<plugin-id>`.
-- Explicit opt-in for native injection, per-plugin enable/disable and
-  dependency ordering.
-- Plugin SHA-256 checks, exact-game-executable hash allowlists, x64 PE
-  validation, and a stable `V3NL_PluginInit` export.
 - Uses normal `CreateProcess` startup and an in-process `LoadLibraryW`
   remote call after the game is running. **Never suspends the game process.**
 - Distinct **Launch without DLLs** troubleshooting mode.

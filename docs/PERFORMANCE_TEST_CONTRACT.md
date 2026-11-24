@@ -3,6 +3,36 @@
 This contract applies to new native engine-performance experiments, especially
 Terra Universalis Alpha 1337.
 
+## Extreme-first triage before optimization
+
+For the owner's Terra Universalis 1337 performance workstream, **screen a
+subsystem with an extreme, single-variable probe BEFORE incremental tuning**.
+Aim for roughly 10× less target-subsystem work, or a completely bypassed
+*optional* gameplay callback if a safe, documented diagnostic-only short-circuit
+exists. Rank by measured reduction in actual complete-day simulation time, NOT
+by hook-call reductions alone. Maintain an evidence register even for zero-effect,
+invalid, or blocked probes.
+
+A startup/scheduler/queue core function must NOT be disabled in an attempt to
+force a large signal: skipped job servicing, missing producer wakeups, and held
+locks make the result an invalid deadlock rather than a benchmark. Map safety
+and verify a no-suspension hook installation method first. Where a safe extreme
+cannot be achieved, mark that target BLOCKED and try a different subsystem.
+
+AI/journal/investment bypass trials that intentionally change game outcomes are
+**DISPOSABLE_DIAGNOSTIC_NONPARITY** tests, not release candidates. Keep the
+baseline intact and separately label world divergence. After screening all
+testable candidates, optionally run a **combined extreme stress trial** only
+with individually safe, compatible probes; label it research-only and do not
+assume its outcomes are valid gameplay. Then develop independently validated,
+*correctness-preserving* optimized plugins for the biggest real bottlenecks.
+Enable these tuned winners together through this launcher in a separate
+release-quality A/B with leave-one-out ablations for overlapping improvements.
+
+The TU-specific screening matrix and result registry are maintained in the
+owner's local performance research workstream, separately from this generic
+public launcher.
+
 ## Workflow
 
 - **Build:** Compile a dedicated x64 DLL from a standalone source directory.
@@ -79,10 +109,12 @@ An existing staged plugin may be tested without a `build` block.
 
 ## Current limits
 
-- This is an offline-tested developer experiment interface, **not** a
-  claim that any performance optimization plugin is ready.
-- Game launch and DLL injection are already present in the GUI; the new
-  experiment runner has not yet been validated end-to-end in live Victoria 3.
+- This is a **live-game-tested developer experiment interface**, not a claim
+  that any performance optimization plugin is ready.
+- On 2026-11-24 the V3NL experiment runner built/loaded the `tu-loader-smoke`
+  no-op DLL and completed two GUI Terra Universalis Alpha 1337 29-day trials
+  with normal exits and no injection errors. That proves loader integration,
+  **not** native scheduler-detour safety, game-state parity or optimization.
 - Game-state parity testing is a separate required acceptance gate.
 - No runtime hook installation may use Windows SuspendThread or ResumeThread.
 - A plugin must not be enabled without explicit user selection or an

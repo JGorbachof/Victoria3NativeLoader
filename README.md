@@ -2,17 +2,7 @@
 
 **A native DLL plugin loader for Victoria 3 on Windows.**
 
-The standard Paradox launcher handles scripted and asset mods, but does not
-provide a convenient, integrated way to inject native DLL plugins into the
-game. V3NL is designed to fill that gap: it lets developers and players install,
-select and load independently developed native x64 plugins alongside their
-existing Victoria 3 mod playsets.
-
-The purpose is to enable native engine extensions, such as performance
-optimizations and other functionality that ordinary game scripting cannot
-provide. Playset import, mod ordering and launch profiles are supporting
-features that keep native plugins convenient to use with existing mods,
-not an attempt to replace the Paradox launcher for ordinary modding.
+The standard Paradox launcher handles scripted and asset mods but has no convenient native DLL plugin workflow. V3NL loads x64 plugins alongside existing playsets, with plugin version checks and separate launch profiles. Native plugins can extend engine behavior beyond ordinary game scripting.
 
 **Status: 0.1.0 developer preview.** No game optimization plugin is bundled
 or enabled. Native plugin integration is experimental and must be validated
@@ -85,31 +75,7 @@ does not patch the game.
 
 ## Native performance experiments
 
-Native engine-performance hooks are developed **as standalone V3NL DLL plugins
-from their first build**. Every runtime A/B test must compile and validate the
-candidate, then launch both the unmodified baseline and the plugin-enabled
-candidate through this launcher's own `launch_game()` path. There is no
-separate manual injector in the supported workflow.
-
-```powershell
-# Static plan: does not compile, launch a game, or inject a DLL
-python run.py --native-experiment path\to\experiment.json --dry-run
-
-# Only after explicitly authorizing the game test:
-python run.py --native-experiment path\to\experiment.json --execute
-```
-
-The developer pipeline validates build outputs, pins the game executable and
-DLL hashes, stages only developer-owned plugin directories, and runs isolated,
-bounded baseline/candidate trials. It refuses to start while any other
-Victoria 3 process is running. It preserves existing mod paths and optionally
-shares the shader cache while isolating saves. No native optimization has yet
-been proven, and this new pipeline has not been tested end-to-end in game.
-
-See [Performance Test Contract](docs/PERFORMANCE_TEST_CONTRACT.md),
-[example experiment manifest](docs/performance_experiment.example.json),
-and [AGENTS.md](AGENTS.md). Runtime testing is never automatic merely because
-a manifest exists; explicit authorization remains necessary.
+For plugin development and controlled baseline/candidate testing, see the [developer guide](docs/PERFORMANCE_EXPERIMENTS.md) and [test contract](docs/PERFORMANCE_TEST_CONTRACT.md). No optimization plugin has been proven, and the experimental pipeline has not been tested end-to-end in game.
 
 ## Development commands
 
@@ -146,9 +112,9 @@ executable, Paradox assets, proprietary DLLs, credentials, or user settings.
   plugin reload, or a downloader/marketplace in 0.1.0.
 - The default game-process guard prevents accidental double launches.
   If a game is already running, close it before launching through V3NL.
-- The game executable is launched directly. This has been the tested
-  path for local 1337 runtime profiles, but Steam-specific services and
-  third-party launcher extensions can behave differently.
+- The game executable is launched directly. This path has been tested in
+  local runtime profiles; Steam-specific services and third-party launcher
+  extensions can behave differently.
 - First-run UI is intentionally built with Windows-compatible Tk/ttk
   rather than a bundled browser framework; no web service is required.
 
@@ -177,5 +143,3 @@ Paradox playsets remain intact. Install only trusted native plugins:
 DLL injection runs code with your permissions. See [SECURITY.md](SECURITY.md).
 
 Source repository: [JGorbachof/Victoria3NativeLoader](https://github.com/JGorbachof/Victoria3NativeLoader).
-The current public release is a developer preview; a built-in performance
-optimization plugin is not included.
